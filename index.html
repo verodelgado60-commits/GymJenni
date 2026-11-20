@@ -261,6 +261,8 @@ function applyTheme(){
 applyTheme();
 if(window.matchMedia){var mq=matchMedia('(prefers-color-scheme: light)');if(mq.addEventListener)mq.addEventListener('change',applyTheme);else if(mq.addListener)mq.addListener(applyTheme)}
 if(!Array.isArray(S.med))S.med=[];
+/* medidas iniciales de Jenni (expediente del gym) */
+if(!S.medSeed){if(!S.med.length)S.med.push({d:'2026-11-20',peso:112.6,est:168,grasa:55.4,musc:19.7,edad:63,basal:1838,visc:9,pecho:122,brazo:42,cintura:109,umb:126,cadera:135,muslo:51,pant:47});S.medSeed=1;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function validIso(k){return typeof k==='string'&&/^\d{4}-\d\d-\d\d$/.test(k)}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('No se pudo guardar')}}
 
@@ -552,7 +554,7 @@ $('v-cal').addEventListener('click',function(ev){
 });
 
 /* ---------- Vista: Jenni (medidas) ---------- */
-var FIELDS=[{k:'peso',n:'Peso'},{k:'est',n:'Estatura',u:'cm'},{k:'grasa',n:'% Grasa',u:'%'},{k:'musc',n:'% Músculo',u:'%'},{k:'edad',n:'Edad metabólica',u:'años'},{k:'basal',n:'Metabolismo basal',u:'kcal'},{k:'visc',n:'Visceral',u:''},
+var FIELDS=[{k:'peso',n:'Peso',u:'kg'},{k:'est',n:'Estatura',u:'cm'},{k:'grasa',n:'% Grasa',u:'%'},{k:'musc',n:'% Músculo',u:'%'},{k:'edad',n:'Edad metabólica',u:'años'},{k:'basal',n:'Metabolismo basal',u:'kcal'},{k:'visc',n:'Visceral',u:''},
   {k:'pecho',n:'Pecho',u:'cm'},{k:'brazo',n:'Brazo',u:'cm'},{k:'cintura',n:'Cintura',u:'cm'},{k:'umb',n:'Umbilical',u:'cm'},{k:'cadera',n:'Glúteo',u:'cm'},{k:'muslo',n:'Muslo',u:'cm'},{k:'pant',n:'Pantorrilla',u:'cm'}];
 function fu(f){return f.u!=null?f.u:S.unit}
 function meds(){return S.med.slice().sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:0})}
@@ -584,7 +586,7 @@ function renderMe(){
     h+='<div class="card"><h2>Historial</h2>';
     list.slice().reverse().forEach(function(x){
       var c=FIELDS.filter(function(f){return x[f.k]!=null}).length;
-      h+='<button class="hist" data-ed="'+x.d+'"><span><b>'+longDate(x.d)+'</b>'+(x.d===list[0].d?' <i class="badge">Inicial</i>':'')+'</span><span>'+(x.peso!=null?fmt(x.peso)+' '+S.unit+' · ':'')+c+(c===1?' dato':' datos')+' &rsaquo;</span></button>';
+      h+='<button class="hist" data-ed="'+x.d+'"><span><b>'+longDate(x.d)+'</b>'+(x.d===list[0].d?' <i class="badge">Inicial</i>':'')+'</span><span>'+(x.peso!=null?fmt(x.peso)+' kg · ':'')+c+(c===1?' dato':' datos')+' &rsaquo;</span></button>';
     });
     h+='<p class="sub" style="margin:10px 0 0">Toca un registro para corregirlo.</p></div>';
   }
@@ -645,7 +647,7 @@ function renderSet(){
   $('file').onchange=function(){
     var f=this.files[0];if(!f)return;var rd=new FileReader();
     rd.onload=function(){try{var p=JSON.parse(rd.result);if(!p||typeof p.sessions!=='object')throw 0;
-      S={unit:p.unit==='lb'?'lb':'kg',start:validIso(p.start)?p.start:S.start,planV:2,vid:(p.vid&&typeof p.vid==='object')?p.vid:S.vid,med:Array.isArray(p.med)?p.med.filter(function(m){return m&&validIso(m.d)}):[],theme:S.theme,sessions:p.sessions};save();renderSet();toast('Respaldo restaurado')}
+      S={unit:p.unit==='lb'?'lb':'kg',start:validIso(p.start)?p.start:S.start,planV:2,medSeed:1,vid:(p.vid&&typeof p.vid==='object')?p.vid:S.vid,med:Array.isArray(p.med)?p.med.filter(function(m){return m&&validIso(m.d)}):[],theme:S.theme,sessions:p.sessions};save();renderSet();toast('Respaldo restaurado')}
       catch(e){toast('Ese archivo no es un respaldo válido')}};
     rd.readAsText(f);
   };
@@ -662,7 +664,7 @@ $('v-set').addEventListener('click',function(ev){
   }
   if(a==='imp'){$('file').click();return}
   if(a==='wipe'){
-    if(Date.now()-wipeArmed<4000){S={unit:S.unit,start:S.start,planV:2,vid:S.vid,med:[],theme:S.theme,sessions:{}};save();wipeArmed=0;renderSet();toast('Datos borrados')}
+    if(Date.now()-wipeArmed<4000){S={unit:S.unit,start:S.start,planV:2,medSeed:1,vid:S.vid,med:[],theme:S.theme,sessions:{}};save();wipeArmed=0;renderSet();toast('Datos borrados')}
     else{wipeArmed=Date.now();b.textContent='Tocar de nuevo';setTimeout(function(){if(b.isConnected)b.textContent='Borrar'},4000)}
   }
 });
