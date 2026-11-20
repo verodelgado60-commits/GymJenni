@@ -190,6 +190,13 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 92px);transform:translateX(-50%);background:var(--text);color:var(--bg);
   padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9;white-space:nowrap}
 .toast.on{opacity:1}
+
+.pollo{position:fixed;left:50%;bottom:110px;z-index:60;display:flex;flex-direction:column;align-items:center;pointer-events:none;transform:translate(-50%,40px) scale(.6);opacity:0;transition:transform .35s cubic-bezier(.3,1.6,.5,1),opacity .25s}
+.pollo.on{transform:translate(-50%,0) scale(1);opacity:1}
+.pollo .globo{background:#fff;color:#2b2233;font-weight:700;font-size:17px;padding:10px 16px;border-radius:18px;box-shadow:0 6px 20px rgba(0,0,0,.18);position:relative;margin-bottom:8px;white-space:nowrap}
+.pollo .globo:after{content:"";position:absolute;left:50%;bottom:-8px;margin-left:-8px;border:8px solid transparent;border-bottom:0;border-top-color:#fff}
+.pollo svg{width:96px;height:96px;animation:brinco .5s ease-in-out infinite alternate}
+@keyframes brinco{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-10px) rotate(4deg)}}
 </style>
 </head>
 <body>
@@ -209,6 +216,18 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
   <button data-v="set"><svg viewBox="0 0 24 24"><path d="M5 7h8M17 7h2M5 17h2M11 17h8"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Ajustes</button>
 </div></nav>
 
+<div class="pollo" id="pollo" aria-live="polite"><div class="globo">¡Felicidades amiguita!</div><svg viewBox="0 0 100 100" aria-hidden="true">
+<ellipse cx="50" cy="94" rx="24" ry="4" fill="rgba(0,0,0,.12)"/>
+<path d="M40 86l-4 7M40 86l1 8M40 86l5 6M60 86l-5 6M60 86l-1 8M60 86l4 7" stroke="#e8892b" stroke-width="3" stroke-linecap="round"/>
+<ellipse cx="50" cy="62" rx="30" ry="27" fill="#ffd23f"/>
+<path d="M22 60c-8-2-12 6-8 10 4-1 8-3 10-6z" fill="#f5bf1f"/><path d="M78 60c8-2 12 6 8 10-4-1-8-3-10-6z" fill="#f5bf1f"/>
+<circle cx="50" cy="36" r="22" fill="#ffd23f"/>
+<path d="M46 15c-2-6 3-9 5-5 1-5 7-4 5 1" stroke="#f5bf1f" stroke-width="4" fill="none" stroke-linecap="round"/>
+<circle cx="42" cy="34" r="3.2" fill="#2b2233"/><circle cx="58" cy="34" r="3.2" fill="#2b2233"/>
+<circle cx="43" cy="33" r="1" fill="#fff"/><circle cx="59" cy="33" r="1" fill="#fff"/>
+<circle cx="36" cy="42" r="3.5" fill="#ff9aa2" opacity=".7"/><circle cx="64" cy="42" r="3.5" fill="#ff9aa2" opacity=".7"/>
+<path d="M45 41l5 6 5-6z" fill="#f08a24"/>
+</svg></div>
 <script>
 /* ---------- Rutina ---------- */
 var UP='Aumentar peso', SAME='Mismo peso', KEEP='Mantener peso';
@@ -332,6 +351,7 @@ function lastFor(id,before){
   return null;
 }
 
+var polloT;function pollo(){var p=$('pollo');p.classList.remove('on');void p.offsetWidth;p.classList.add('on');clearTimeout(polloT);polloT=setTimeout(function(){p.classList.remove('on')},2200)}
 /* ---------- Vista: Rutina ---------- */
 function renderHoy(){
   var s=S.sessions[cur]; var today=iso(new Date());
@@ -409,7 +429,7 @@ $('v-hoy').addEventListener('click',function(ev){
       if(e.r==null)e.r=ex.weeks[s3.week-1].r;
       if(!ex.sec&&e.p==null){var l=lastFor(id,cur);if(l&&l.e.p!=null){if(ex.weeks[s3.week-1].n!==UP)e.p=l.e.p}else if(!l&&ex.p0!=null)e.p=ex.p0}
     }
-    save();renderHoy();return;
+    save();renderHoy();if(e.ok)pollo();return;
   }
   if(a==='done'){
     var s4=session(true);s4.done=!s4.done;
